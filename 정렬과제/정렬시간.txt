@@ -1,0 +1,163 @@
+#include <cstdio>
+#include <algorithm>
+#include <vector>
+#include <ctime>
+using namespace std;
+
+//난수 생성기 
+int myrandom(int i) { return rand() % i; }
+vector<int> randGenerator(int n) {
+    vector<int> v;
+    srand(time(NULL));
+    for (int i = 0; i <= n; i++) {
+        v.push_back(i);
+    }
+    random_shuffle(v.begin(), v.end(), myrandom);
+    return v;
+}
+
+//선택 정렬 
+void selectionSort(vector<int> v) {
+    for (int i = 0; i < v.size() - 1; i++) {
+        for (int j = i + 1; j < v.size(); j++)
+            if (v[i] >= v[j])
+                swap(v[i], v[j]);
+    }
+    //  printf("--선택 정렬 결과--\n");
+    //  for(int i = 0; i<v.size();i++)
+    //      printf("%d ",v[i]);
+    //  printf("\n\n");
+}
+
+// 삽입 정렬 
+void insertionSort(vector<int> v) {
+    for (int i = 1; i < v.size(); i++) {
+        int key = v[i], j = i - 1;
+        while (j >= 0 && key < v[j]) {
+            swap(v[j], v[j + 1]);
+            j--;
+        }
+        v[j + 1] = key;
+    }
+    //  printf("--삽입 정렬 결과--\n");
+    //  for(int i = 0; i<v.size();i++)
+    //      printf("%d ",v[i]); 
+    //  printf("\n\n");
+}
+
+//버블 정렬 
+void bubbleSort(vector<int> v) {
+    for (int i = 0; i < v.size() - 1; i++) {
+        for (int j = 1; j < v.size() - i; j++)
+            if (v[j - 1] > v[j])
+                swap(v[j - 1], v[j]);
+    }
+    //  printf("--버블 정렬 결과--\n");
+    //  for(int i = 0; i<v.size();i++)
+    //      printf("%d ",v[i]);
+    //  printf("\n\n");
+}
+
+
+//병합 정렬 
+void merge(vector<int>& v, int s, int e, int m) {
+    vector<int> ret;
+    int i = s, j = m + 1, copy = 0;
+
+    //결과를 저장할 배열에 하나씩 비교하여 저장한다. 
+    while (i <= m && j <= e) {
+        if (v[i] < v[j])ret.push_back(v[i++]);
+        else if (v[i] > v[j])ret.push_back(v[j++]);
+    }
+
+    //남은 값들을 뒤에 채워넣어준다. 
+    while (i <= m)  ret.push_back(v[i++]);
+    while (j <= e)  ret.push_back(v[j++]);
+
+    //원래 배열에 복사해준다. 
+    for (int k = s; k <= e; k++) {
+        v[k] = ret[copy++];
+    }
+}
+
+void mergeSort(vector<int>& v, int s, int e) {
+    if (s < e) {
+        int m = (s + e) / 2;
+        /*divide, 분할*/
+        mergeSort(v, s, m);//s부터 m까지
+        mergeSort(v, m + 1, e); //m+1부터 e까지 
+        /*conquer, 병합*/
+        merge(v, s, e, m);
+    }
+}
+
+
+
+//퀵 정렬 
+void qsort(vector<int>& v, int s, int e) {
+    int pivot = v[s];
+    int bs = s, be = e;
+    while (s < e) {
+        while (pivot <= v[e] && s < e) e--;
+        if (s > e) break;
+        while (pivot >= v[s] && s < e) s++;
+        if (s > e) break;
+        std::swap(v[s], v[e]);
+    }
+    std::swap(v[bs], v[s]);
+    if (bs < s)
+        qsort(v, bs, s - 1);
+    if (be > e)
+        qsort(v, s + 1, be);
+
+}
+
+
+int main() {
+    clock_t start, end;
+    int n;// 숫자 갯수
+    printf("랜덤 숫자 범위(1~n) : ");
+    scanf_s("%d", &n);
+    vector<int> v = randGenerator(n);
+
+    //  printf("정렬 전 : ");
+    //  for(int i=0;i<n;i++)
+    //      printf("%d ",v[i]);
+    printf("\n\n");
+    start = clock();
+    selectionSort(v);
+    end = clock();
+    printf("선택 정렬 수행시간 : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    start = clock();
+    insertionSort(v);
+    end = clock();
+    printf("삽입 정렬 수행시간 : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    start = clock();
+    bubbleSort(v);
+    end = clock();
+    printf("버블 정렬 수행시간 : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    vector<int> v2 = v;
+
+    start = clock();
+    mergeSort(v2, 0, v.size() - 1);
+    end = clock();
+    //  printf("--병합 정렬 결과--\n");
+    //  for(int i=0;i<v2.size();i++)
+    //      printf("%d ",v2[i]);
+    //  printf("\n\n"); 
+    printf("병합 정렬 수행시간 : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+
+    start = clock();
+    qsort(v, 0, v.size() - 1);
+    end = clock();
+    //  printf("--퀵 정렬 결과--\n");
+    //  for(int i=0;i<v.size();i++)
+    //      printf("%d ",v[i]);
+    //  printf("\n"); 
+    printf("퀵 정렬 수행시간   : %lf\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+}
